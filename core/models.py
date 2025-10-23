@@ -1,11 +1,8 @@
 # core/models.py
 
 from django.db import models
-from django.conf import settings  # <-- GARANTA QUE ESTA LINHA EXISTA
+from django.conf import settings 
 from django.utils import timezone
-
-# Não precisamos mais da linha 'User = settings.AUTH_USER_MODEL' aqui em cima.
-# Vamos usar o settings.AUTH_USER_MODEL diretamente nos campos.
 
 class Conta(models.Model):
     """
@@ -21,7 +18,7 @@ class Conta(models.Model):
 
     # Relacionamento: Cada conta pertence a UM usuário.
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,  # <-- CORREÇÃO AQUI
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='contas',
         verbose_name='Usuário'
@@ -31,7 +28,7 @@ class Conta(models.Model):
     
     tipo = models.CharField(
         'Tipo de Conta',
-        max_length=10,
+        max_length=14,
         choices=TipoConta.choices,
         default=TipoConta.CONTA_CORRENTE
     )
@@ -60,7 +57,7 @@ class Categoria(models.Model):
     Categorias para classificar despesas e receitas (Ex: Alimentação, Salário).
     """
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,  # <-- CORREÇÃO AQUI
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='categorias',
         verbose_name='Usuário'
@@ -87,7 +84,7 @@ class Transacao(models.Model):
         DESPESA = 'DESPESA', 'Despesa'
 
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,  # <-- CORREÇÃO AQUI
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='transacoes',
         verbose_name='Usuário'

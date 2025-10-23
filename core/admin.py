@@ -18,5 +18,4 @@ class TransacaoAdmin(admin.ModelAdmin):
     list_display = ('descricao', 'data', 'tipo', 'valor', 'conta', 'categoria', 'efetivada')
     list_filter = ('tipo', 'data', 'efetivada', 'conta', 'categoria')
     search_fields = ('descricao',)
-    # Filtro de data hierárquico, muito útil
     date_hierarchy = 'data'
