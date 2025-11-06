@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if object %}Editar Transação - {{ object.descricao }}{% else %}Adicionar Nova Transação{% endif %}
+{% endblock %}
+
+{% block content %}
+
+    {% if object %}
+        <h1 class="text-warning"><i class="bi bi-pencil-square"></i> Editar Transação</h1>
+    {% else %}
+        <h1 class="text-success"><i class="bi bi-plus-circle"></i> Adicionar Nova Transação</h1>
+    {% endif %}
+
+    <p class="lead text-muted">Preencha os campos para registrar uma movimentação financeira.</p>
+
+    <div class="card shadow-sm border-0 mt-4">
+        <div class="card-body">
+            
+            <form method="post" class="needs-validation" novalidate>
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <div class="row g-3">
+                    
+                    <div class="col-md-6">
+                        <label for="{{ form.tipo.id_for_label }}" class="form-label">{{ form.tipo.label }}</label>
+                        {{ form.tipo }}
+                        {% for error in form.tipo.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <label for="{{ form.valor.id_for_label }}" class="form-label">{{ form.valor.label }} (R$)</label>
+                        {{ form.valor }}
+                        <div class="form-text">{{ form.valor.help_text }}</div>
+                        {% for error in form.valor.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="{{ form.conta.id_for_label }}" class="form-label">{{ form.conta.label }}</label>
+                        {{ form.conta }}
+                        {% for error in form.conta.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="{{ form.categoria.id_for_label }}" class="form-label">{{ form.categoria.label }}</label>
+                        {{ form.categoria }}
+                        {% for error in form.categoria.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="{{ form.data.id_for_label }}" class="form-label">{{ form.data.label }}</label>
+                        {{ form.data }}
+                        {% for error in form.data.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                    </div>
+                    
+                    <div class="col-md-6 d-flex align-items-end">
+                        <div class="form-check pb-2">
+                            {{ form.efetivada }}
+                            <label class="form-check-label" for="{{ form.efetivada.id_for_label }}">
+                                {{ form.efetivada.label }}
+                            </label>
+                            <div class="form-text">{{ form.efetivada.help_text }}</div>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <label for="{{ form.descricao.id_for_label }}" class="form-label">{{ form.descricao.label }}</label>
+                        {{ form.descricao }}
+                        {% for error in form.descricao.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                    </div>
+                    
+                    <div class="col-12 mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg me-2">
+                            {% if object %}<i class="bi bi-save"></i> Salvar Edição{% else %}<i class="bi bi-check-circle"></i> Registrar Transação{% endif %}
+                        </button>
+                        <a href="{% url 'extrato_transacoes' %}" class="btn btn-secondary btn-lg">Cancelar</a>
+                    </div>
+                    
+                </div>
+            </form>
+            </div>
+    </div>
+
+{% endblock content %}

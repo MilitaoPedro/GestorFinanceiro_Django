@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% load humanize %} 
+
+{% block title %}Extrato de Transações{% endblock %}
+
+{% block content %}
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="text-primary"><i class="bi bi-list-columns"></i> Extrato de Transações</h1>
+        <a href="{% url 'adicionar_transacao' %}" class="btn btn-success"><i class="bi bi-plus-circle"></i> Nova Transação</a>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            {% if transacoes %}
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col">Data</th>
+                                <th scope="col">Descrição</th>
+                                <th scope="col">Tipo</th>
+                                <th scope="col">Valor</th>
+                                <th scope="col">Conta</th>
+                                <th scope="col">Categoria</th>
+                                <th scope="col">Status</th>
+                                <th scope="col" class="text-end">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for transacao in transacoes %}
+                                <tr>
+                                    <td>{{ transacao.data|date:"d/m/Y" }}</td>
+                                    <td>{{ transacao.descricao|truncatechars:70 }}</td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if transacao.tipo == 'RECEITA' %}text-bg-success{% else %}text-bg-danger{% endif %}">
+                                            {{ transacao.get_tipo_display }}
+                                        </span>
+                                    </td>
+                                    <td class="fw-bold 
+                                        {% if transacao.tipo == 'RECEITA' %}text-success{% else %}text-danger{% endif %}">
+                                        {% if transacao.tipo == 'DESPESA' %}-{% else %}+{% endif %} R$ {{ transacao.valor|floatformat:2|intcomma }}
+                                    </td>
+                                    <td>{{ transacao.conta.nome }}</td>
+                                    <td>{{ transacao.categoria.nome|default:"-" }}</td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if transacao.efetivada %}text-bg-primary{% else %}text-bg-warning{% endif %}">
+                                            {% if transacao.efetivada %}Efetivada{% else %}Pendente{% endif %}
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <a href="{% url 'editar_transacao' transacao.pk %}" class="btn btn-sm btn-outline-info me-1" title="Editar">
+                                            <i class="bi bi-pencil"></i> Editar
+                                        </a>
+                                        <a href="{% url 'excluir_transacao' transacao.pk %}" class="btn btn-sm btn-outline-danger" title="Excluir">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="p-4 text-center text-muted">
+                    <p class="lead">Nenhuma transação registrada ainda.</p>
+                    <a href="{% url 'adicionar_transacao' %}" class="btn btn-primary">Comece adicionando uma transação!</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    {% if is_paginated %}
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo; Anterior</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link">&laquo; Anterior</span></li>
+            {% endif %}
+
+            {% for i in paginator.page_range %}
+                {% if page_obj.number == i %}
+                    <li class="page-item active" aria-current="page"><span class="page-link">{{ i }}</span></li>
+                {% else %}
+                    <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Próxima &raquo;</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link">Próxima &raquo;</span></li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+
+{% endblock content %}

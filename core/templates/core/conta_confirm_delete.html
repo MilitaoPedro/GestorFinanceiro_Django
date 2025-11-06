@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Excluir Conta{% endblock %}
+
+{% block content %}
+    
+    <div class="card shadow-sm border-danger">
+        <div class="card-header bg-danger text-white">
+            <h4 class="mb-0"><i class="bi bi-exclamation-triangle-fill"></i> Confirmação de Exclusão de Conta</h4>
+        </div>
+        <div class="card-body">
+            <p class="lead">Tem certeza que deseja **EXCLUIR** a conta:</p>
+            
+            <div class="alert alert-light border p-3">
+                <p><strong>Nome da Conta:</strong> {{ object.nome }}</p>
+                <p><strong>Tipo:</strong> {{ object.get_tipo_display }}</p>
+                <p class="fw-bold text-danger">ATENÇÃO: Todas as transações ligadas a esta conta também serão excluídas!</p>
+            </div>
+            
+            <form method="post" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger btn-lg me-2"><i class="bi bi-trash"></i> Sim, Excluir Conta e Transações</button>
+                <a href="{% url 'lista_contas' %}" class="btn btn-secondary btn-lg">Cancelar</a>
+            </form>
+        </div>
+    </div>
+
+{% endblock content %}

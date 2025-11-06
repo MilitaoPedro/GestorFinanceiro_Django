@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Gerenciar Categorias{% endblock %}
+
+{% block content %}
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="text-primary"><i class="bi bi-tags-fill"></i> Minhas Categorias</h1>
+        <a href="{% url 'adicionar_categoria' %}" class="btn btn-success"><i class="bi bi-plus-circle"></i> Nova Categoria</a>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            {% if categorias %}
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col">Nome da Categoria</th>
+                                <th scope="col" class="text-end">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for categoria in categorias %}
+                                <tr>
+                                    <td>{{ categoria.nome }}</td>
+                                    <td class="text-end">
+                                        <a href="{% url 'editar_categoria' categoria.pk %}" class="btn btn-sm btn-outline-info me-1" title="Editar">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a href="{% url 'excluir_categoria' categoria.pk %}" class="btn btn-sm btn-outline-danger" title="Excluir">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="p-4 text-center text-muted">
+                    <p class="lead">Você ainda não possui nenhuma categoria cadastrada.</p>
+                    <a href="{% url 'adicionar_categoria' %}" class="btn btn-primary">Adicionar Primeira Categoria</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+{% endblock content %}

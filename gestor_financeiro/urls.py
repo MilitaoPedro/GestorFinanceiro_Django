@@ -20,3 +20,20 @@ from django.urls import path
 urlpatterns = [
     path('admin/', admin.site.urls),
 ]
+
+
+# Seu urls.py principal
+from django.contrib import admin
+from django.urls import path, include
+from core.views import DashboardView # Importa a view que criamos
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    # Rota raiz (página inicial)
+    path('', DashboardView.as_view(), name='dashboard'), 
+    # Inclui as rotas do app core (a ser criado a seguir)
+    path('', include('core.urls')), 
+    # *Se você usa um app de autenticação (ex: allauth):*
+    # path('accounts/', include('allauth.urls')),
+    path('auth/', include('django.contrib.auth.urls')),
+]

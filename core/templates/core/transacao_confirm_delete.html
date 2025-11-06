@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Confirmar Exclusão{% endblock %}
+
+{% block content %}
+    
+    <div class="card shadow-sm border-danger">
+        <div class="card-header bg-danger text-white">
+            <h4 class="mb-0"><i class="bi bi-exclamation-triangle-fill"></i> Confirmação de Exclusão</h4>
+        </div>
+        <div class="card-body">
+            <p class="lead">Tem certeza que deseja **EXCLUIR** a seguinte transação?</p>
+            
+            <div class="alert alert-light border p-3">
+                <p><strong>Descrição:</strong> {{ object.descricao }}</p>
+                <p><strong>Valor:</strong> 
+                    <span class="fw-bold {% if object.tipo == 'RECEITA' %}text-success{% else %}text-danger{% endif %}">
+                        {% if object.tipo == 'DESPESA' %}-{% else %}+{% endif %} R$ {{ object.valor }}
+                    </span>
+                </p>
+                <p><strong>Data:</strong> {{ object.data|date:"d/m/Y" }}</p>
+            </div>
+            
+            <form method="post" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger btn-lg me-2"><i class="bi bi-trash"></i> Sim, Excluir Definitivamente</button>
+                <a href="{% url 'extrato_transacoes' %}" class="btn btn-secondary btn-lg">Cancelar</a>
+            </form>
+        </div>
+    </div>
+
+{% endblock content %}

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if object %}Editar Categoria - {{ object.nome }}{% else %}Adicionar Nova Categoria{% endif %}
+{% endblock %}
+
+{% block content %}
+
+    {% if object %}
+        <h1 class="text-warning"><i class="bi bi-pencil-square"></i> Editar Categoria</h1>
+    {% else %}
+        <h1 class="text-success"><i class="bi bi-tags-fill"></i> Adicionar Nova Categoria</h1>
+    {% endif %}
+
+    <p class="lead text-muted">Preencha o nome da categoria (Ex: Transporte, Salário).</p>
+
+    <div class="card shadow-sm border-0 mt-4">
+        <div class="card-body">
+            
+            <form method="post">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <div class="row g-3">
+                    
+                    <div class="col-md-6">
+                        <label for="{{ form.nome.id_for_label }}" class="form-label">{{ form.nome.label }}</label>
+                        {{ form.nome }}
+                        {% for error in form.nome.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                    </div>
+                    
+                    <div class="col-12 mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg me-2">
+                            {% if object %}<i class="bi bi-save"></i> Salvar Edição{% else %}<i class="bi bi-check-circle"></i> Cadastrar Categoria{% endif %}
+                        </button>
+                        <a href="{% url 'lista_categorias' %}" class="btn btn-secondary btn-lg">Cancelar</a>
+                    </div>
+                    
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+{% endblock content %}

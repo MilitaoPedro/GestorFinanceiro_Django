@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% load humanize %} 
+
+{% block title %}Gerenciar Contas{% endblock %}
+
+{% block content %}
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="text-primary"><i class="bi bi-wallet2"></i> Minhas Contas</h1>
+        <a href="{% url 'adicionar_conta' %}" class="btn btn-success"><i class="bi bi-plus-circle"></i> Nova Conta</a>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            {% if contas %}
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col">Nome</th>
+                                <th scope="col">Tipo</th>
+                                <th scope="col">Saldo Inicial (R$)</th>
+                                <th scope="col">Data de Criação</th>
+                                <th scope="col" class="text-end">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for conta in contas %}
+                                <tr>
+                                    <td>{{ conta.nome }}</td>
+                                    <td>
+                                        <span class="badge text-bg-info">{{ conta.get_tipo_display }}</span>
+                                    </td>
+                                    <td class="fw-bold text-dark">R$ {{ conta.saldo_inicial|floatformat:2|default:"0.00"|intcomma }}</td>
+                                    <td>{{ conta.data_criacao|date:"d/m/Y H:i" }}</td>
+                                    <td class="text-end">
+                                        <a href="{% url 'editar_conta' conta.pk %}" class="btn btn-sm btn-outline-info me-1" title="Editar">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a href="{% url 'excluir_conta' conta.pk %}" class="btn btn-sm btn-outline-danger" title="Excluir">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="p-4 text-center text-muted">
+                    <p class="lead">Você ainda não possui nenhuma conta cadastrada.</p>
+                    <a href="{% url 'adicionar_conta' %}" class="btn btn-primary">Adicionar Primeira Conta</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+{% endblock content %}

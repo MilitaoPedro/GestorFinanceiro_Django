@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+
+{% load humanize %} 
+
+{% block title %}Dashboard | Seu Controle Financeiro{% endblock %}
+
+{% block content %}
+
+    <h1 class="text-primary mb-4"><i class="bi bi-graph-up"></i> Resumo do Mês</h1>
+
+    <div class="row g-4 mb-5">
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card shadow-sm h-100 border-start border-primary border-5">
+                <div class="card-body">
+                    <div class="h6 text-uppercase text-muted mb-2">Saldo Geral (Total)</div>
+                    <div class="h2 fw-bold text-primary">R$ {{ saldo_total|floatformat:2|default:"0.00"|intcomma }}</div>
+                    <div class="text-muted small">Saldo atual de todas as contas</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card shadow-sm h-100 border-start border-success border-5">
+                <div class="card-body">
+                    <div class="h6 text-uppercase text-muted mb-2">Receitas (Mês)</div>
+                    <div class="h2 fw-bold text-success">R$ {{ receita_mes|floatformat:2|default:"0.00"|intcomma }}</div>
+                    <div class="text-muted small">Total de entradas no mês atual</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card shadow-sm h-100 border-start border-danger border-5">
+                <div class="card-body">
+                    <div class="h6 text-uppercase text-muted mb-2">Despesas (Mês)</div>
+                    <div class="h2 fw-bold text-danger">R$ {{ despesa_mes|floatformat:2|default:"0.00"|intcomma }}</div>
+                    <div class="text-muted small">Total de saídas no mês atual</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-3">
+            <div class="card shadow-sm h-100 border-start border-warning border-5">
+                <div class="card-body">
+                    <div class="h6 text-uppercase text-muted mb-2">Balanço do Mês</div>
+                    <div class="h2 fw-bold {% if saldo_mes >= 0 %}text-success{% else %}text-danger{% endif %}">
+                        R$ {{ saldo_mes|floatformat:2|default:"0.00"|intcomma }}
+                    </div>
+                    <div class="text-muted small">Resultado líquido deste mês</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    
+    <h2 class="h4 mt-5 mb-4 text-secondary">Análise Detalhada</h2>
+
+    <div class="row g-4 mb-5">
+        
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-light">Evolução do Saldo Mensal</div>
+                <div class="card-body">
+                    <canvas id="balancoMensalChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-light">Despesas por Categoria</div>
+                <div class="card-body">
+                    <canvas id="despesasCategoriaChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row g-4">
+        
+        <div class="col-lg-6">
+            <h2 class="h4 mb-3 text-secondary"><i class="bi bi-wallet2"></i> Saldo por Conta</h2>
+            
+            <div class="card shadow-sm border-0">
+                <ul class="list-group list-group-flush">
+                    {% for conta in contas %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ conta.nome }}</strong>
+                                <span class="badge text-bg-info ms-2">{{ conta.get_tipo_display }}</span>
+                            </div>
+                            <span class="fw-bold text-dark">R$ {{ conta.saldo_atual|floatformat:2|default:"0.00"|intcomma }}</span>
+                        </li>
+                    {% empty %}
+                        <li class="list-group-item text-center text-muted p-4">
+                            <p class="mb-0">Nenhuma conta cadastrada. <a href="{% url 'adicionar_conta' %}">Adicione uma agora!</a></p>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <h2 class="h4 mb-3 text-secondary"><i class="bi bi-clock-history"></i> Transações Recentes</h2>
+            
+            <div class="card shadow-sm border-0">
+                {% if extrato_recente %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Data</th>
+                                    <th scope="col">Descrição</th>
+                                    <th scope="col" class="text-end">Valor</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for transacao in extrato_recente %}
+                                    <tr onclick="window.location='{% url 'editar_transacao' transacao.pk %}'" style="cursor: pointer;">
+                                        <td>{{ transacao.data|date:"d/m" }}</td>
+                                        <td>
+                                            {{ transacao.descricao|truncatechars:30 }}
+                                            <small class="text-muted d-block">{{ transacao.conta.nome }}</small>
+                                        </td>
+                                        <td class="text-end fw-bold {% if transacao.tipo == 'RECEITA' %}text-success{% else %}text-danger{% endif %}">
+                                            {% if transacao.tipo == 'DESPESA' %}-{% else %}+{% endif %} R$ {{ transacao.valor|floatformat:2|intcomma }}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="card-footer text-end">
+                        <a href="{% url 'extrato_transacoes' %}" class="btn btn-sm btn-outline-secondary">Ver Extrato Completo <i class="bi bi-arrow-right"></i></a>
+                    </div>
+                {% else %}
+                    <div class="card-body text-center text-muted p-4">
+                        <p class="mb-0">Nenhuma transação recente encontrada no seu extrato efetivado.</p>
+                        <a href="{% url 'adicionar_transacao' %}" class="btn btn-sm btn-primary mt-2">Adicionar Primeira Transação</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+    </div>
+
+{% endblock content %}
+
+
+{% block extra_js %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+
+    <script>
+        // Dados injetados pela view do Django (agora usando JSON.parse do Python)
+        const balancoLabels = JSON.parse('{{ chart_balanco_labels|safe }}');
+        const balancoData = JSON.parse('{{ chart_balanco_data|safe }}');
+        const despesasLabels = JSON.parse('{{ chart_despesas_labels|safe }}');
+        const despesasData = JSON.parse('{{ chart_despesas_data|safe }}');
+
+        // Função para gerar cores aleatórias (para o Gráfico de Pizza)
+        function generateColors(count) {
+            const colors = [];
+            for(let i = 0; i < count; i++) {
+                // Gera cores vibrantes usando HSL
+                const hue = i * (360 / count);
+                colors.push(`hsl(${hue}, 70%, 50%)`);
+            }
+            return colors;
+        }
+
+        // --- GRÁFICO DE BALANÇO MENSAL (LINHA) ---
+        if (document.getElementById('balancoMensalChart')) {
+            new Chart(document.getElementById('balancoMensalChart'), {
+                type: 'line',
+                data: {
+                    labels: balancoLabels,
+                    datasets: [{
+                        label: 'Balanço (R$)',
+                        data: balancoData,
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // --- GRÁFICO DE DESPESAS POR CATEGORIA (PIZZA) ---
+        if (document.getElementById('despesasCategoriaChart')) {
+            new Chart(document.getElementById('despesasCategoriaChart'), {
+                type: 'pie',
+                data: {
+                    labels: despesasLabels,
+                    datasets: [{
+                        data: despesasData,
+                        backgroundColor: generateColors(despesasLabels.length),
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Distribuição de Despesas'
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+{% endblock extra_js %}
